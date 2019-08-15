@@ -2228,10 +2228,9 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
         if (getChildCount() == 0) {
             return 0;
         }
-        int allChildrenCount = state.getItemCount();
         ensureOrientationHelper();
-        View firstReferenceView = findFirstReferenceChild(allChildrenCount);
-        View lastReferenceView = findLastReferenceChild(allChildrenCount);
+        View firstReferenceView = findFirstVisibleChild();
+        View lastReferenceView = findLastVisibleChild();
         if (state.getItemCount() == 0 || firstReferenceView == null || lastReferenceView == null) {
             return 0;
         }
@@ -2323,12 +2322,17 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
             return 0;
         }
         assert mFlexboxHelper.mIndexToFlexLine != null;
-        int firstVisiblePosition = findFirstVisibleItemPosition();
-        int lastVisiblePosition = findLastVisibleItemPosition();
+        int minPosition = getPosition(firstReferenceView);
+        int maxPosition = getPosition(lastReferenceView);
         int laidOutArea = Math.abs(mOrientationHelper.getDecoratedEnd(lastReferenceView) -
                 mOrientationHelper.getDecoratedStart(firstReferenceView));
-        int laidOutRange = lastVisiblePosition - firstVisiblePosition + 1;
-        return (int) ((float) laidOutArea / laidOutRange * state.getItemCount());
+        int firstLinePosition = mFlexboxHelper.mIndexToFlexLine[minPosition];
+        if (firstLinePosition == NO_POSITION) {
+            return 0;
+        }
+        int lastLinePosition = mFlexboxHelper.mIndexToFlexLine[maxPosition];
+        int lineRange = lastLinePosition - firstLinePosition + 1;
+        return (int) ((float) laidOutArea / lineRange * getFlexLines().size());
     }
 
     /**
@@ -2458,6 +2462,10 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
         return child == null ? NO_POSITION : getPosition(child);
     }
 
+    public View findFirstVisibleChild() {
+        return findOneVisibleChild(0, getChildCount(), false);
+    }
+
     /**
      * Returns the adapter position of the first fully visible view. This position does not include
      * adapter changes that were dispatched after the last layout pass.
@@ -2490,6 +2498,10 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
     public int findLastVisibleItemPosition() {
         final View child = findOneVisibleChild(getChildCount() - 1, -1, false);
         return child == null ? NO_POSITION : getPosition(child);
+    }
+
+    public View findLastVisibleChild() {
+        return findOneVisibleChild(getChildCount() - 1, -1, false);
     }
 
     /**
