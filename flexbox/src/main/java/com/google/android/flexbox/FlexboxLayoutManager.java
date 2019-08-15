@@ -122,6 +122,8 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
      */
     private RecyclerView.State mState;
 
+    private double mLayoutExtraFactor = 2.0;
+
     private LayoutState mLayoutState;
 
     private AnchorInfo mAnchorInfo = new AnchorInfo();
@@ -1711,10 +1713,10 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
             mLayoutState.mInfinite = false;
         }
         if (!isMainAxisDirectionHorizontal() && mIsRtl) {
-            mLayoutState.mAvailable = anchorInfo.mCoordinate - getPaddingRight();
+            mLayoutState.mAvailable = (int) mLayoutExtraFactor * (anchorInfo.mCoordinate - getPaddingRight());
         } else {
-            mLayoutState.mAvailable =
-                    mOrientationHelper.getEndAfterPadding() - anchorInfo.mCoordinate;
+            mLayoutState.mAvailable = (int) mLayoutExtraFactor * (
+                    mOrientationHelper.getEndAfterPadding() - anchorInfo.mCoordinate);
         }
         mLayoutState.mPosition = anchorInfo.mPosition;
         mLayoutState.mItemDirection = LayoutState.ITEM_DIRECTION_TAIL;
@@ -1753,11 +1755,11 @@ public class FlexboxLayoutManager extends RecyclerView.LayoutManager implements 
             mLayoutState.mInfinite = false;
         }
         if (!isMainAxisDirectionHorizontal() && mIsRtl) {
-            mLayoutState.mAvailable = mParent.getWidth() - anchorInfo.mCoordinate
-                    - mOrientationHelper.getStartAfterPadding();
+            mLayoutState.mAvailable = (int) mLayoutExtraFactor * (mParent.getWidth() - anchorInfo.mCoordinate
+                    - mOrientationHelper.getStartAfterPadding());
         } else {
-            mLayoutState.mAvailable = anchorInfo.mCoordinate - mOrientationHelper
-                    .getStartAfterPadding();
+            mLayoutState.mAvailable = (int) mLayoutExtraFactor * (anchorInfo.mCoordinate - mOrientationHelper
+                    .getStartAfterPadding());
         }
         mLayoutState.mPosition = anchorInfo.mPosition;
         mLayoutState.mItemDirection = LayoutState.ITEM_DIRECTION_TAIL;
